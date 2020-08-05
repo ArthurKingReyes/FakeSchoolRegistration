@@ -5,6 +5,14 @@
  */
 package fakeschool;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author arthur
@@ -181,11 +189,36 @@ public class registration extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtcourseActionPerformed
 
+        Connection con1;
+        PreparedStatement insert;
+    
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
         String name = txtname.getText();
         String mobile = txtmobile.getText();
         String course = txtcourse.getText();
+        //Connection con1;
+        //PreparedStatement insert;
+        
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            con1 = DriverManager.getConnection("jdbc:mysql://localhost/fakeschool?serverTimezone=PST", "jdbc_user", "password1");
+            insert = con1.prepareStatement("insert into records(name, mobile, course) values(?,?,?)"); // records is the table name
+            insert.setString(1, name); // 1 is first parameter in the query
+            insert.setString(2, mobile); // 2 is second param, etc.
+            insert.setString(3, course);
+            insert.executeUpdate();
+            
+            JOptionPane.showMessageDialog(this, "Record Added");
+        } 
+        
+        catch (ClassNotFoundException ex) {
+            Logger.getLogger(registration.class.getName()).log(Level.SEVERE, null, ex);
+        } 
+        
+        catch (SQLException ex) {
+            Logger.getLogger(registration.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
     }//GEN-LAST:event_jButton1ActionPerformed
 
