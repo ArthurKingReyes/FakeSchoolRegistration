@@ -8,10 +8,14 @@ package fakeschool;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -24,6 +28,7 @@ public class registration extends javax.swing.JFrame {
      */
     public registration() {
         initComponents();
+        table_update();
     }
 
     /**
@@ -154,11 +159,11 @@ public class registration extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 62, Short.MAX_VALUE)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(66, 66, 66))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 430, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(36, 36, 36))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(362, Short.MAX_VALUE)
                 .addComponent(jLabel1)
                 .addGap(347, 347, 347))
         );
@@ -181,6 +186,54 @@ public class registration extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    Connection con1;
+    PreparedStatement insert;
+    
+    private void table_update() {
+        int c;
+        
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            con1 = DriverManager.getConnection("jdbc:mysql://localhost/fakeschool?serverTimezone=PST", "jdbc_user", "password1");
+            insert = con1.prepareStatement("select * from records"); // build query
+            ResultSet rs = insert.executeQuery(); //ResultSet represents a table of data from a database result set
+            ResultSetMetaData rsmd = rs.getMetaData(); 
+            c = rsmd.getColumnCount();
+            
+            DefaultTableModel df = (DefaultTableModel) jTable1.getModel(); //jTable1 is the name of the right panel that shows the records
+            df.setRowCount(0);
+            
+            while(rs.next()) {
+                Vector v2 = new Vector(); // Vector is similar to ArrayList but synchronized. Need to use a Vector to use DefaultTableModel to add row
+                
+                for(int i=0; i<c; i++) {
+                    v2.add(rs.getString("id"));
+                    v2.add(rs.getString("name"));
+                    v2.add(rs.getString("mobile"));
+                    v2.add(rs.getString("course"));
+                }
+                
+                df.addRow(v2);
+            }
+            
+            
+            
+            // Clear text fields
+            txtname.setText("");
+            txtmobile.setText("");
+            txtcourse.setText("");
+            txtname.requestFocus(); // Puts the cursor focus back on the name text box
+        } 
+        
+        catch (ClassNotFoundException ex) {
+            Logger.getLogger(registration.class.getName()).log(Level.SEVERE, null, ex);
+        } 
+        
+        catch (SQLException ex) {
+            Logger.getLogger(registration.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
     private void txtnameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtnameActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtnameActionPerformed
@@ -189,16 +242,12 @@ public class registration extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtcourseActionPerformed
 
-        Connection con1;
-        PreparedStatement insert;
     
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
         String name = txtname.getText();
         String mobile = txtmobile.getText();
         String course = txtcourse.getText();
-        //Connection con1;
-        //PreparedStatement insert;
         
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -210,6 +259,13 @@ public class registration extends javax.swing.JFrame {
             insert.executeUpdate();
             
             JOptionPane.showMessageDialog(this, "Record Added");
+            table_update();
+            
+            // Clear text fields
+            txtname.setText("");
+            txtmobile.setText("");
+            txtcourse.setText("");
+            txtname.requestFocus(); // Puts the cursor focus back on the name text box
         } 
         
         catch (ClassNotFoundException ex) {
