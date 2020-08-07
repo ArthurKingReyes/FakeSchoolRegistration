@@ -85,6 +85,11 @@ public class registration extends javax.swing.JFrame {
         });
 
         jButton2.setText("Edit");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jButton3.setText("Delete");
 
@@ -249,7 +254,8 @@ public class registration extends javax.swing.JFrame {
 
     
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
+        // Add button action
+        
         String name = txtname.getText();
         String mobile = txtmobile.getText();
         String course = txtcourse.getText();
@@ -284,7 +290,8 @@ public class registration extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
-        // TODO add your handling code here:
+        // Highlight record in jTable and show values in text fields
+        
         DefaultTableModel df = (DefaultTableModel) jTable1.getModel();
         int selectedIndex = jTable1.getSelectedRow();
         
@@ -292,6 +299,46 @@ public class registration extends javax.swing.JFrame {
         txtmobile.setText(df.getValueAt(selectedIndex, 2).toString());
         txtcourse.setText(df.getValueAt(selectedIndex, 3).toString());
     }//GEN-LAST:event_jTable1MouseClicked
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // Edit button action
+        
+        DefaultTableModel df = (DefaultTableModel) jTable1.getModel();
+        int selectedIndex = jTable1.getSelectedRow();
+        
+        try {
+            int id = Integer.parseInt(df.getValueAt(selectedIndex, 0).toString());
+            String name = txtname.getText();
+            String mobile = txtmobile.getText();
+            String course = txtcourse.getText();
+            
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            con1 = DriverManager.getConnection("jdbc:mysql://localhost/fakeschool?serverTimezone=PST", "jdbc_user", "password1");
+            insert = con1.prepareStatement("update records set name=?, mobile=?, course=? where id=?"); // records is the table name
+            insert.setString(1, name); // 1 is first parameter in the query
+            insert.setString(2, mobile); // 2 is second param, etc.
+            insert.setString(3, course);
+            insert.setInt(4, id); // would have to change setInt to something else if I decide to change the column data type later on
+            insert.executeUpdate();
+            
+            JOptionPane.showMessageDialog(this, "Record Updated");
+            table_update();
+            
+            // Clear text fields
+            txtname.setText("");
+            txtmobile.setText("");
+            txtcourse.setText("");
+            txtname.requestFocus(); // Puts the cursor focus back on the name text box
+        } 
+        
+        catch (ClassNotFoundException ex) {
+            Logger.getLogger(registration.class.getName()).log(Level.SEVERE, null, ex);
+        } 
+        
+        catch (SQLException ex) {
+            Logger.getLogger(registration.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * @param args the command line arguments
