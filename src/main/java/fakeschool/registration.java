@@ -92,6 +92,11 @@ public class registration extends javax.swing.JFrame {
         });
 
         jButton3.setText("Delete");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -339,6 +344,45 @@ public class registration extends javax.swing.JFrame {
             Logger.getLogger(registration.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // Delete button action
+        
+        DefaultTableModel df = (DefaultTableModel) jTable1.getModel();
+        int selectedIndex = jTable1.getSelectedRow();
+        
+        try {
+            int id = Integer.parseInt(df.getValueAt(selectedIndex, 0).toString());
+            int dialogResult = JOptionPane.showConfirmDialog(null, "Do you want to Delete the Record?", "Warning", JOptionPane.YES_NO_OPTION);
+            
+            if (dialogResult == JOptionPane.YES_OPTION) {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                con1 = DriverManager.getConnection("jdbc:mysql://localhost/fakeschool?serverTimezone=PST", "jdbc_user", "password1");
+                insert = con1.prepareStatement("delete from records where id=?"); // records is the table name
+                
+                insert.setInt(1, id); // would have to change setInt to something else if I decide to change the column data type later on
+                insert.executeUpdate();
+            
+                JOptionPane.showMessageDialog(this, "Record Deleted");
+                table_update();
+            
+                // Clear text fields
+                txtname.setText("");
+                txtmobile.setText("");
+                txtcourse.setText("");
+                txtname.requestFocus();
+            }
+            
+        } 
+        
+        catch (ClassNotFoundException ex) {
+            Logger.getLogger(registration.class.getName()).log(Level.SEVERE, null, ex);
+        } 
+        
+        catch (SQLException ex) {
+            Logger.getLogger(registration.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton3ActionPerformed
 
     /**
      * @param args the command line arguments
